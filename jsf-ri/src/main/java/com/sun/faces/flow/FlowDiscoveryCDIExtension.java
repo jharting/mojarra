@@ -105,11 +105,6 @@ public class FlowDiscoveryCDIExtension implements Extension {
         
     }
     
-    void afterBeanDiscovery(@Observes final AfterBeanDiscovery event) {
-        event.addContext(new FlowDiscoveryCDIContext(flowProducers));
-        flowProducers.clear();
-    }
-    
     <T> void findFlowDefiners(@Observes ProcessProducer<T, Flow> pp) {
     	if (pp.getAnnotatedMember().isAnnotationPresent(FlowDefinition.class)) {
             flowProducers.add(pp.getProducer());

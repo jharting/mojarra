@@ -82,7 +82,7 @@ import com.sun.faces.el.VariableResolverChainWrapper;
 import com.sun.faces.facelets.PrivateApiFaceletCacheAdapter;
 import com.sun.faces.facelets.tag.jsf.PassThroughAttributeLibrary;
 import com.sun.faces.facelets.tag.jsf.PassThroughElementLibrary;
-import com.sun.faces.flow.FlowDiscoveryCDIContext;
+import com.sun.faces.flow.FlowDiscoveryCDIExtension;
 import com.sun.faces.lifecycle.ELResolverInitPhaseListener;
 
 import java.io.IOException;
@@ -320,8 +320,8 @@ public class ApplicationAssociate {
         private synchronized void loadFlows(FacesContext context, FlowHandler flowHandler) throws IOException {
             javax.enterprise.inject.spi.BeanManager beanManager = (javax.enterprise.inject.spi.BeanManager) 
                     Util.getCDIBeanManager(context.getExternalContext().getApplicationMap());
-            FlowDiscoveryCDIContext flowDiscoveryContext = (FlowDiscoveryCDIContext) beanManager.getContext(FlowDefinition.class);
-            List<Producer<Flow>> flowProducers = flowDiscoveryContext.getFlowProducers();
+            FlowDiscoveryCDIExtension flowDiscoveryCDIExtension = beanManager.getExtension(FlowDiscoveryCDIExtension.class);
+            List<Producer<Flow>> flowProducers = flowDiscoveryCDIExtension.getFlowProducers();
             WebConfiguration config = WebConfiguration.getInstance();
             if (!flowProducers.isEmpty()) {
                 enableClientWindowModeIfNecessary(context);
