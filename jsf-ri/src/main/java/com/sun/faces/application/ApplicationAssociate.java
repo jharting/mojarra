@@ -112,6 +112,8 @@ import java.util.LinkedHashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.Producer;
 import javax.faces.FacesException;
 import javax.faces.FactoryFinder;
@@ -320,7 +322,13 @@ public class ApplicationAssociate {
         private synchronized void loadFlows(FacesContext context, FlowHandler flowHandler) throws IOException {
             javax.enterprise.inject.spi.BeanManager beanManager = (javax.enterprise.inject.spi.BeanManager) 
                     Util.getCDIBeanManager(context.getExternalContext().getApplicationMap());
-            FlowDiscoveryCDIExtension flowDiscoveryCDIExtension = beanManager.getExtension(FlowDiscoveryCDIExtension.class);
+            // obtain FlowDiscoveryCDIExtension reference
+            Bean<?> bean = beanManager.resolve(beanManager.getBeans(FlowDiscoveryCDIExtension.class));
+            if (bean == null) {
+                throw new IllegalStateException(FlowDiscoveryCDIExtension.class.getName() + " not available");
+            }
+            CreationalContext<?> ctx = beanManager.createCreationalContext(bean);
+            FlowDiscoveryCDIExtension flowDiscoveryCDIExtension = (FlowDiscoveryCDIExtension) beanManager.getReference(bean, FlowDiscoveryCDIExtension.class, ctx);
             List<Producer<Flow>> flowProducers = flowDiscoveryCDIExtension.getFlowProducers();
             WebConfiguration config = WebConfiguration.getInstance();
             if (!flowProducers.isEmpty()) {
